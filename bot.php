@@ -1,432 +1,93 @@
 <?php
-    date_default_timezone_set("Asia/kolkata");
-    //Data From Webhook
-    $content = file_get_contents("php://input");
-    $update = json_decode($content, true);
-    $chat_id = $update["message"]["chat"]["id"];
-    $message = $update["message"]["text"];
-    $id = $update["message"]["from"]["id"];
-    $username = $update["message"]["from"]["username"];
-    $firstname = $update["message"]["from"]["first_name"];
-    $bot_name = "" ;//your bot name
- /// for broadcasting in Channel
-$channel_id = "-1001351780832"; 
 
-    //Extact match Commands
-    if($message == "/start"){
-        send_message($chat_id, "Hey $firstname I am $bot_name \nSupport Group - @world_bots \nUse /cmds to view commands \nBot developed by @reboot13 ");
-    }
+ini_set('error_reporting', E_ALL);
 
-    if($message == "/cmds"){
-        send_message($chat_id, "
-          /search <input> (Google search)
-          \n/syt <query> (Youtube Search)
-          \n/dict <word> (Dicitonary)
-          \n/smirror <name> (Search Movies/Series)
-          \n/bin <bin> (Bin Data)
-          \n/weather <name of your city> (Current weather Status)
-          \n/dice (random 1-6)
-          \n/date (today's date)
-          \n/time (current time)
-          \n/git <username>
-          \n/info (User Info)
-          \n/donate (Donate to Creator)
-          ");
-    }
+$botToken = "1526063655:AAE-i4rZKL_99ZuBLZ01h58e2KWF8GIlOoA";
+$website = "https://api.telegram.org/bot".$botToken;
 
-    if($message == "/dice"){
-        $number = rand(1,6);
-        send_message($chat_id, $number);
-    }
-    if($message == "/date"){
-        $date = date("d/m/y");
-        send_message($chat_id, $date);
-    }
-   if($message == "/time"){
-        $time = date("h:i a", time());
-        send_message($chat_id, $time);
-    }
-    
-     if($message == "/info"){
-        send_message($chat_id, "User Info \nName: $firstname\nID:$id \nUsername: @$username");
-    }
+$update = file_get_contents('php://input');
+$update = json_decode($update, TRUE);
 
-if($message == "/help"){
-        send_message($chat_id, "Contact @Reboot13");
-    }
-if($message == "/donate"){
-        send_message($chat_id, "https://reboot13.hashnode.dev/donate");
-    }
+$chatId = $update["message"]["chat"]["id"];
+$message = $update["message"]["text"]; 
 
-///Commands with text
-
-
-    //Google Search
-if (strpos($message, "/search") === 0) {
-        $search = substr($message, 8);
-         $search = preg_replace('/\s+/', '+', $search);
-    if ($search != null) {
-     send_message($chat_id, "https://www.google.com/search?q=".$search);
-    }
-  }
-
-//World Mirror Search
-if (strpos($message, "/smirror") === 0) {
-$smovie = substr($message, 9);
-$smovie = preg_replace('/\s+/', '+', $smovie);
-$murl = "[Results-Go to World Mirror](https://witcher.lalbaake456.workers.dev/0:search?q=$smovie)";
-if ($smovie != null) {
-  send_MDmessage($chat_id, $murl);
-}
+if (strpos($message, "/start") === 0){
+sendMessage($chatId, 
+"🦇 HEYYY ! 🦇 
+TYPE /cmds TO KNOW ALL MY COMMANDS 
+BOT FOR CC MADE BY => 🦇 @tplein_dkk_cc 🦇 ", $message_id);
 }
 
-//Youtube Search
-if (strpos($message, "/syt") === 0) {
-$syt = substr($message, 5);
-$syt = preg_replace('/\s+/', '+', $syt);
-$yurl = "[Open Youtube](https://www.youtube.com/results?search_query=$syt)";
-if ($syt != null) {
-  send_MDmessage($chat_id, $yurl);
-}
+//////////=========[Cmds Command]=========//////////
+
+elseif (strpos($message, "/cmds") === 0){
+sendMessage($chatId, 
+"🦇 COMMANDS 🦇
+/b3 => braintreeChecker
+/st => stripeChecker
+/bin => binInfo", $message_id);
 }
 
 
-///Channel BroadCast
-if (strpos($message, "/broadcast") === 0) {
-$broadcast = substr($message, 11);
-// id == (admins user id)
-if ($id == 1171876903 || $id == 1478297206 || $id == 654455829 || $id == 638178378 ) {
-  send_Cmessage($channel_id, $broadcast);
-}
+elseif (strpos($message, "/b3") === 0){
+sendMessage($chatId, 
+            "🦇 HEY ! 🦇
+ this COMMANDS is currently in maintenance
+               COME BACK LATER ", $message_id);
 }
 
-
-//Bin Lookup
-   if(strpos($message, "/bin") === 0){
-        $bin = substr($message, 5);
-   $curl = curl_init();
-   curl_setopt_array($curl, [
-	CURLOPT_URL => "https://lookup.binlist.net/".$bin,
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_ENCODING => "",
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 30,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	CURLOPT_CUSTOMREQUEST => "GET",
-	CURLOPT_HTTPHEADER => [
-		"authority: lookup.binlist.net",
-		"accept: application/json",
-		"accept-language: en-GB,en-US;q=0.9,en;q=0.8,hi;q=0.7",
-		"origin: https://binlist.net",
-		"https://binlist.net/",
-		"sec-fetch-dest: empty",
-		"sec-fetch-site: same-site"
-	],
-]);
-
-$result = curl_exec($curl);
-curl_close($curl);
-$data = json_decode($result, true);
-$bank = $data['bank']['name'];
-$country = $data['country']['alpha2'];
-$currency = $data['country']['currency'];
-$emoji = $data['country']['emoji'];
-$scheme = $data['scheme'];
-$Brand = $data['brand'];
-$type = $data['type'];
-  if ($scheme != null) {
-        send_message($chat_id, "
-    Bin: $bin
-Type: $scheme
-Brand : $Brand
-Bank: $bank
-Country: $country $emoji
-Currency: $currency
-Credit/Debit:$type
-Checked By @$username ");
-    }
-else {
-    send_message($chat_id, "Enter Valid BIN");
-}
-   }
-    
-
-//Dictionary API
-      if(strpos($message, "/dict") === 0){
-        $dict = substr($message, 6);
-   $curl = curl_init();
-   curl_setopt_array($curl, [
-	CURLOPT_URL => "https://oxforddictionaryapi.herokuapp.com/?define=$dict&lang=en",
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_ENCODING => "",
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 30,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	CURLOPT_CUSTOMREQUEST => "GET",
-	CURLOPT_HTTPHEADER => [
-		"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-        "Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,hi;q=0.7",
-        "Host: oxforddictionaryapi.herokuapp.com",
-        "Sec-Fetch-Dest: empty",
-        "Sec-Fetch-Mode: cors",
-        "Sec-Fetch-Site: cross-site",
-        ],
-]);
-
-
-  $dictionary = curl_exec($curl);
-  curl_close($curl);
-
-$out = json_decode($dictionary, true);
-$word = $out[0]['word'];
-$noun= $out[0]['meaning']['noun'][0]['definition'];
-$verb = $out[0]['meaning']['verb'][0]['definition'];
-$adjective = $out[0]['meaning']['adjective'][0]['definition'];
-$adverb = $out[0]['meaning']['adverb'][0]['definition'];
-$pronoun = $out[0]['meaning']['pronoun'][0]['definition'];
-
-if ($word = $dict) {
-        send_message($chat_id, "
-Word: $word 
-Noun : $noun
-Pronoun: $pronoun 
-Verb : $verb 
-Adjective: $adjective 
-Adverb: $adverb 
-Checked By @$username ");
-    }
-    else {
-        send_message($chat_id, "Invalid Input");
-    }
+elseif (strpos($message, "/st") === 0){
+sendMessage($chatId, 
+            "🦇 HEY ! 🦇
+ this COMMANDS is currently in maintenance
+               COME BACK LATER ", $message_id);
 }
 
 
-
-
-    //Wheather API
-if(strpos($message, "/weather") === 0){
-        $location = substr($message, 9);
-   $curl = curl_init();
-   curl_setopt_array($curl, [
-CURLOPT_URL => "http://api.openweathermap.org/data/2.5/weather?q=$location&appid=89ef8a05b6c964f4cab9e2f97f696c81",
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_ENCODING => "",
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 50,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	CURLOPT_CUSTOMREQUEST => "GET",
-	CURLOPT_HTTPHEADER => [
-		"Accept: */*",
-        "Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,hi;q=0.7",
-        "Host: api.openweathermap.org",
-        "sec-fetch-dest: empty",
-		"sec-fetch-site: same-site"
-  ],
-]);
-
-
-$content = curl_exec($curl);
-curl_close($curl);
-$resp = json_decode($content, true);
-
-$weather = $resp['weather'][0]['main'];
-$description = $resp['weather'][0]['description'];
-$temp = $resp['main']['temp'];
-$humidity = $resp['main']['humidity'];
-$feels_like = $resp['main']['feels_like'];
-$country = $resp['sys']['country'];
-$name = $resp['name'];
-$kelvin = 273;
-$celcius = $temp - $kelvin;
-$feels = $feels_like - $kelvin;
-
-if ($location = $name) {
-        send_message($chat_id, "
-    Weather at $location: $weather
-Status: $description
-Temp : $celcius °C
-Feels Like : $feels °C
-Humidity: $humidity
-Country: $country 
-Checked By @$username ");
-}
-else {
-           send_message($chat_id, "Invalid City");
-}
-    }
-
-///Github User API
-if(strpos($message, "/git") === 0){
-  $git = substr($message, 5);
-   $curl = curl_init();
-   curl_setopt_array($curl, [
-CURLOPT_URL => "https://api.github.com/users/$git",
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_FOLLOWLOCATION => true,
-  CURLOPT_ENCODING => "",
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 50,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => "GET",
-  CURLOPT_HTTPHEADER => [
-    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    "Accept-Encoding: gzip, deflate, br",
-    "Accept-Language: en-GB,en;q=0.9",
-    "Host: api.github.com",
-    "Sec-Fetch-Dest: document",
-    "Sec-Fetch-Mode: navigate",
-    "Sec-Fetch-Site: none",
-    "Sec-Fetch-User: ?1",
-    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
-  ],
-]);
-
-
-$github = curl_exec($curl);
-curl_close($curl);
-$gresp = json_decode($github, true);
-
-$gusername = $gresp['login'];
-$glink = $gresp['html_url'];
-$gname = $gresp['name'];
-$gcompany = $gresp['company'];
-$blog = $gresp['blog'];
-$gbio = $gresp['bio'];
-$grepo = $gresp['public_repos'];
-$gfollowers = $gresp['followers'];
-$gfollowings = $gresp['following'];
-
-
-if ($gusername) {
-        send_message($chat_id, "
-Name: $gname
-Username: $gusername
-Bio: $gbio
-Followers: $gfollowers
-Following : $gfollowings
-Repositories: $grepo
-Website: $blog
-Company: $gcompany
-Github url: $glink
-Checked By @$username ");
-}
-else {
-           send_message($chat_id, "User Not Found \nInvalid github username checked by @$username");
-}
-    }
-
-   if(strpos($message, "/inbtc") === 0){
-        $inbtc = substr($message, 7);
-   $curl = curl_init();
-   curl_setopt_array($curl, [
-	CURLOPT_URL => "https://blockchain.info/tobtc?currency=USD&value=$inbtc",
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_ENCODING => "",
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 30,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "GET",
-    CURLOPT_POSTFIELDS => "currency=USD&value=$inbtc",
-	CURLOPT_HTTPHEADER => [
-		"authority: blockchain.info",
-		"accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-		"accept-language: en-GB,en-US;q=0.9,en;q=0.8,hi;q=0.7",
-		"pragma: no-cache",
-        "sec-fetch-dest: document",
-        "sec-fetch-mode: navigate",
-        "sec-fetch-site: none",
-        "sec-fetch-user: ?1",
-'User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'
-	],
-]);
-
-$result = curl_exec($curl);
-curl_close($curl);
-$data = json_decode($result, true);
-
-  if ($data != null) {
-        send_message($chat_id, " $data BTC");
-    }
-else {
-    send_message($chat_id, "Enter Valid Value");
-}
-   }
-
-if(strpos($message, "/shorturl") === 0){
-$shorturl = substr($message, 10);
-$curl = curl_init();
-curl_setopt_array($curl, [
-CURLOPT_URL => "https://cutt.ly/scripts/shortenUrl.php",
-CURLOPT_POSTFIELDS =>"     ",
-CURLOPT_RETURNTRANSFER => true,
-CURLOPT_FOLLOWLOCATION => true,
-CURLOPT_ENCODING => "------WebKitFormBoundaryv2WBBQPOwQhLOls0
-Content-Disposition: form-data; name="url"
-
-$shorturl
-------WebKitFormBoundaryv2WBBQPOwQhLOls0
-Content-Disposition: form-data; name="domain"
-
-0
-------WebKitFormBoundaryv2WBBQPOwQhLOls0--",
-CURLOPT_MAXREDIRS => 10,
-CURLOPT_TIMEOUT => 30,
-CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-CURLOPT_CUSTOMREQUEST => "GET",
-CURLOPT_HTTPHEADER => [
-    "accept: */*",
-"accept-language: en-US,en;q=0.9",
-"content-type: multipart/form-data; boundary=----WebKitFormBoundaryv2WBBQPOwQhLOls0",
-"cookie: __cfduid=d79cfa665a19acbe4a59cdf48674bf3cb1608033162; PHPSESSID=nonoaosn0ra3v592ggdqrtg1am; _ga=GA1.2.744713507.1608033165; _gid=GA1.2.277358472.1608033165; _gat_gtag_UA_112763434_1=1; cookies_accepted=T",
-"origin: https://cutt.ly",
-"referer: https://cutt.ly/",
-"sec-ch-ua: "Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"",
-"sec-ch-ua-mobile: ?0",
-"sec-fetch-dest: empty",
-"sec-fetch-mode: cors",
-"sec-fetch-site: same-origin",
-"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"   
-],
-]);
-
-$result = curl_exec($curl);
-curl_close($curl);
-$data = json_decode($result, true);
-
-
-
-send_MDmessage($chat_id, "***Input Url= $shorturl 
-    Results = $data
-    Url Shortend By @$username ***");
+elseif (strpos($message, "/bin") === 0){
+$bin = substr($message, 5);
+function GetStr($string, $start, $end){
+$str = explode($start, $string);
+$str = explode($end, $str[1]);  
+return $str[0];
+};
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, 'https://lookup.binlist.net/'.$bin.'');
+curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Host: lookup.binlist.net',
+'Cookie: _ga=GA1.2.549903363.1545240628; _gid=GA1.2.82939664.1545240628',
+'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'));
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+$fim = curl_exec($ch);
+$bank = GetStr($fim, '"bank":{"name":"', '"');
+$name = GetStr($fim, '"name":"', '"');
+$brand = GetStr($fim, '"brand":"', '"');
+$country = GetStr($fim, '"country":{"name":"', '"');
+$scheme = GetStr($fim, '"scheme":"', '"');
+$type = GetStr($fim, '"type":"', '"');
+if(strpos($fim, '"type":"credit"') !== false){
+$bin = 'Credit';
+}else{
+$bin = 'Debit';
+};
+sendMessage($chatId, '
+🦇 VALID BIN 🦇
+BANK => '.$bank.'
+COUNTRY => '.$name.'
+BRAND => '.$brand.'
+CARD => '.$scheme.'
+TYPE => '.$type.'
+BOT MADE by => 🦇 @tplein_dkk_cc 🦇', $message_id);
 }
 
-    
 
+function sendMessage ($chatId, $message) {
 
+	$url = $GLOBALS[website]."/sendMessage?chat_id=".$chatId."&text=".urlencode($message);
+	file_get_contents($url);
+}
 
-     ///Send Message (Global)
-    function send_message($chat_id, $message){
-        $apiToken =  "API_TOKEN";
-        $text = urlencode($message);
-        file_get_contents("https://api.telegram.org/bot$apiToken/sendMessage?chat_id=$chat_id&text=$text");
-    }
-    
-//Send Messages with Markdown (Global)
-      function send_MDmessage($chat_id, $message){
-       $apiToken =  "API_TOKEN";
-        $text = urlencode($message);
-        file_get_contents("https://api.telegram.org/bot$apiToken/sendMessage?chat_id=$chat_id&text=$text&parse_mode=Markdown");
-    }
-    
-
-///Send Message to Channel
-      function send_Cmessage($channel_id, $message){
-       $apiToken =  "API_TOKEN";
-        $text = urlencode($message);
-        file_get_contents("https://api.telegram.org/bot$apiToken/sendMessage?chat_id=$channel_id&text=$text");
-    }
 ?>
